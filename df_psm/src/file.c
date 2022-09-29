@@ -59,19 +59,16 @@ static email_t* take_email(FILE *file)
 	fread(&neww->id, 1, 1, file);
 	fread(&neww->nl, 1, 1, file); 
 	fread(&neww->dl, 1, 1, file); 
-	fread(&neww->pl, 1, 1, file);
 
 	chachaCipher(&neww->id,1);
 	chachaCipher(&neww->nl,1);
 	chachaCipher(&neww->dl,1);
-	chachaCipher(&neww->pl,1);
 
-	neww->local = (char*)malloc(neww->nl + neww->dl + neww->pl +1);
+	neww->local = (char*)malloc(neww->nl + neww->dl + 1);
 	neww->domain = neww->local + neww->nl + 1;
-	neww->password = neww->local + neww->nl + neww->dl + 1;
-	fread(neww->local, 1, neww->nl + neww->dl + neww->pl +1, file);
+	fread(neww->local, 1, neww->nl + neww->dl + 1, file);
 
-	chachaCipher(neww->local, neww->nl + neww->dl + neww->pl +1);
+	chachaCipher(neww->local, neww->nl + neww->dl + 1);
 
 	return neww;
 }
@@ -221,12 +218,11 @@ void save_file( const char *path )
 			data[0] =  (*trace)->id;
 			data[1] =  (*trace)->nl;
 			data[2] =  (*trace)->dl;
-			data[3] =  (*trace)->pl;			
 
-			memcpy( data+4, (*trace)->local, data[1] + data[2] + data[3] + 1);
-			chachaCipher(data, 4 + data[1] + data[2] + data[3] + 1);
+			memcpy( data+3, (*trace)->local, data[1] + data[2] + 1);
+			chachaCipher(data, 3 + data[1] + data[2] + 1);
 
-			fwrite( data, 1, 4 + (*trace)->nl + (*trace)->dl + (*trace)->pl + 1, file );
+			fwrite( data, 1, 3 + (*trace)->nl + (*trace)->dl + 1, file );
 
 			trace = &(*trace)->next;
 		}

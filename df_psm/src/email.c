@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-email_t *email_create(const char *email, const char *password, uint8_t email_length, uint8_t password_length)
+email_t *email_create(const char *email, uint8_t email_length)
 {
 	if ( email ) {
 		email_t *nemail = (email_t*)malloc(sizeof(email_t));
@@ -19,18 +19,12 @@ email_t *email_create(const char *email, const char *password, uint8_t email_len
 				nemail->nl = i;
 				nemail->dl = email_length-i-1;
 
-				nemail->local = (char*)malloc( email_length + password_length );
+				nemail->local = (char*)malloc( email_length );
 				
 				memcpy( nemail->local, email, email_length );
 				nemail->domain = nemail->local + nemail->nl + 1;
 				// memcpy( nemail->domain, email+i+1, nemail->dl);
 				
-				if ( password ) {
-					nemail->pl = password_length;
-					nemail->password = nemail->local + email_length;
-					memcpy(nemail->password, password, password_length);
-				}
-
 				nemail->next = NULL;
 
 				break;
@@ -62,7 +56,7 @@ email_list_t* email_list_create()
 void email_destroy( email_t *email ) 
 {
 	if ( email ) {
-		memset(email->local, 0xff, email->nl + email->dl + email->pl + 1);
+		memset(email->local, 0xff, email->nl + email->dl + 1);
 		free( email->local );
 		email->next = NULL;
 		free(email);
@@ -175,7 +169,7 @@ int8_t email_exits_name( const char *name, email_list_t *list )
 		email_t **trace = &list->head;
 
 		while (*trace) {
-			if ( strncmp( name, (*trace)->local, (*trace)->dl + (*trace)->nl + (*trace)->pl + 1 ) ) 
+			if ( strncmp( name, (*trace)->local, (*trace)->dl + (*trace)->nl + 1 ) ) 
 				return 1;
 			trace = &(*trace)->next;
 		}
@@ -190,7 +184,7 @@ uint8_t email_get_id( const char *name, email_list_t *list )
 		email_t **trace = &list->head;
 
 		while (*trace) {
-			if ( strncmp( name, (*trace)->local, (*trace)->dl + (*trace)->nl + (*trace)->pl + 1 ) ) 
+			if ( strncmp( name, (*trace)->local, (*trace)->dl + (*trace)->nl + 1 ) ) 
 				return (*trace)->id;
 			trace = &(*trace)->next;
 		}

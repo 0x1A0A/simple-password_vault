@@ -8,9 +8,9 @@ typedef struct df_email_list email_list_t;
 
 // struct for email address
 struct df_email_address {
-	char *local, *domain, *password;
+	char *local, *domain;
 	email_t *next;
-	uint8_t nl, dl, pl, id;
+	uint8_t nl, dl, id;
 };
 
 // linked list wrapper for email addresses
@@ -19,7 +19,7 @@ struct df_email_list {
 	uint8_t count;
 };
 
-email_t * email_create(const char *email, const char *password, uint8_t email_length, uint8_t password_length);
+email_t * email_create(const char *email, uint8_t email_length);
 email_list_t *email_list_create();
 void email_destroy ( email_t *email);
 void email_list_destroy(email_list_t *list);
