@@ -23,5 +23,7 @@ uint8_t sha256context_add(struct df_sha256context *ctx, byte *in, size_t length)
 uint8_t sha256context_end(struct df_sha256context *ctx, byte out[32]);
 // 		destroy sha256 contex
 void sha256context_destroy(struct df_sha256context *ctx);
+//		reset sha256 context
+void sha256_reset(struct df_sha256context *ctx);
 
 #endif

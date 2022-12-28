@@ -5,37 +5,35 @@
 
 email_t *email_create(const char *email, uint8_t email_length)
 {
-	if ( email ) {
-		email_t *nemail = (email_t*)malloc(sizeof(email_t));
-		uint8_t i = 0;
+	if ( !email ) return NULL;
 
-		if (!email) {
-			fprintf(stderr, "can't allocate email\n");
-			return NULL;
-		}
+	email_t *nemail = (email_t*)malloc(sizeof(email_t));
+	uint8_t i = 0;
 
-		while ( ++i ) {
-			if ( email[i] == '@' ) {
-				nemail->nl = i;
-				nemail->dl = email_length-i-1;
-
-				nemail->local = (char*)malloc( email_length );
-				
-				memcpy( nemail->local, email, email_length );
-				nemail->domain = nemail->local + nemail->nl + 1;
-				// memcpy( nemail->domain, email+i+1, nemail->dl);
-				
-				nemail->next = NULL;
-
-				break;
-			}
-		}
-
-		nemail->id = 0;
-		return nemail;
+	if (!nemail) {
+		fprintf(stderr, "can't allocate email\n");
+		return NULL;
 	}
 
-	return NULL;
+	while ( ++i ) {
+		if ( email[i] == '@' ) {
+			nemail->nl = i;
+			nemail->dl = email_length-i-1;
+
+			nemail->local = (char*)malloc( email_length );
+			
+			memcpy( nemail->local, email, email_length );
+			nemail->domain = nemail->local + nemail->nl + 1;
+			// memcpy( nemail->domain, email+i+1, nemail->dl);
+			
+			nemail->next = NULL;
+
+			break;
+		}
+	}
+
+	nemail->id = 0;
+	return nemail;
 }
 
 email_list_t* email_list_create() 

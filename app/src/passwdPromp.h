@@ -1,3 +1,5 @@
+// this is work on linux
+
 #include <termios.h>
 #include <unistd.h>
 

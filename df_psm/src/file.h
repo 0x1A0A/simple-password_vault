@@ -7,5 +7,5 @@
 
 void load_file( const char *path );
 void save_file( const char *path );
-
+unsigned char verify( const char *path);
 #endif

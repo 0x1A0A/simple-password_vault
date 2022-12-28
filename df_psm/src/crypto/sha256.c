@@ -27,7 +27,7 @@ static const word SHA256_ROUND_CONST[] = {
 	0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
 };
 
-static void sha256_init(struct df_sha256context *ctx)
+void sha256_reset(struct df_sha256context *ctx)
 {
 	memset( ctx->data_chunk, 0, 64);
 	ctx->total_bit = ctx->current_index = 0;
@@ -82,7 +82,7 @@ struct df_sha256context* sha256context_create()
 {
 	struct df_sha256context *o = (struct df_sha256context*) malloc( sizeof(struct df_sha256context) );
 	
-	sha256_init(o);
+	sha256_reset(o);
 
 	return o;
 }

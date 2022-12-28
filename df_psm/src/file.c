@@ -99,6 +99,34 @@ static account_t* take_account(FILE *file)
 	return neww;
 }
 
+unsigned char verify(const char *path)
+{
+	FILE *file = fopen( path, "r" );
+	
+	if (!file) {
+		fprintf(stderr, "can't open file for reading: %s\n", path);
+		return 0;
+	}
+
+	cypher->index = 0;	
+	size_t i = 0;
+	while (i++ < 8) fgetc(file);
+	
+	byte data[32];	
+	uint8_t BUFF;
+	
+	// hash password
+	fread(data, 1, 32, file);
+	chachaCipher(data, 32);
+
+	if ( strncmp( hash, data, 32 ) ) {
+		fprintf( stderr, "password incorrect\n" );
+		return 0;
+	}
+	
+	return 1;
+}
+
 void load_file( const char *path )
 {
 	FILE *file = fopen( path, "r" );
@@ -158,7 +186,7 @@ void save_file( const char *path )
 	size_t i = 0;
 
 	// empty first 8 byte with no reason
-	while (i++ < 8) fputc(0, file);
+	while (i++ < 8) fputc(0xaa, file);
 	
 	byte data[256];
 	size_t BUFF;
@@ -179,7 +207,7 @@ void save_file( const char *path )
 
 	// data tag >> email >> account
 
-	BUFF = data[0] = 0;//tl->count;
+	BUFF = data[0] = tag_list->count;
 	chachaCipher(data, 1);
 	fwrite(data, 1, 1, file);
 
@@ -228,7 +256,7 @@ void save_file( const char *path )
 		}
 	}
 
-	BUFF = data[0] = 0;//al->count;
+	BUFF = data[0] = account_list->count;
 	chachaCipher(data, 1);
 	fwrite(data, 1, 1, file);
 
