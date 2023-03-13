@@ -195,18 +195,6 @@ void save_file( const char *path )
 	chachaCipher(data, 32);
 	fwrite(data, 1, 32, file);
 
-	// for ( int j=0; j<64; ++j ) printf("%02x", cypher->stream[j]);
-	// puts("");
-	// for (int j=0; j<32; ++j) printf("%02x", hash[j]);
-	// puts("");
-	// for (int j=0; j<32; ++j) printf("%02x", data[j]);
-
-	// fwrite(hash, 1, 32, file);
-	
-	// for (int j=0; j<32; ++j) printf("%0x", hash[j]);
-
-	// data tag >> email >> account
-
 	BUFF = data[0] = tag_list->count;
 	chachaCipher(data, 1);
 	fwrite(data, 1, 1, file);
@@ -214,16 +202,11 @@ void save_file( const char *path )
 	if (BUFF) { 
 		tag_t **trace = &tag_list->head;
 		while (*trace) {
-			// fwrite( &(*trace)->id, 1, 1, file );
-			// fwrite( &(*trace)->nl, 1, 1, file );
-			// fwrite( (*trace)->name, 1, (*trace)->nl, file );
-			
 			data[0] =  (*trace)->id;
 			data[1] =  (*trace)->nl;
+
 			memcpy( data+2, (*trace)->name, data[1]);
-
 			chachaCipher(data, 2+data[1]);
-
 			fwrite( data, 1, 2+(*trace)->nl, file );
 
 			trace = &(*trace)->next;
@@ -237,19 +220,12 @@ void save_file( const char *path )
 	if (BUFF) { 
 		email_t **trace = &email_list->head;
 		while (*trace) {
-			// fwrite( &(*trace)->id, 1, 1, file );
-			// fwrite( &(*trace)->nl, 1, 1, file );
-			// fwrite( &(*trace)->dl, 1, 1, file );
-			// fwrite( &(*trace)->pl, 1, 1, file );
-			// fwrite( (*trace)->local, 1, (*trace)->nl + (*trace)->dl + (*trace)->pl + 1, file );
-
 			data[0] =  (*trace)->id;
 			data[1] =  (*trace)->nl;
 			data[2] =  (*trace)->dl;
 
 			memcpy( data+3, (*trace)->local, data[1] + data[2] + 1);
 			chachaCipher(data, 3 + data[1] + data[2] + 1);
-
 			fwrite( data, 1, 3 + (*trace)->nl + (*trace)->dl + 1, file );
 
 			trace = &(*trace)->next;
@@ -263,13 +239,6 @@ void save_file( const char *path )
 	if (BUFF) { 
 		account_t **trace = &account_list->head;
 		while (*trace) {
-			// fwrite( &(*trace)->email_id, 1, 1, file );
-			// fwrite( &(*trace)->tag_id, 1, 1, file );
-			// fwrite( &(*trace)->nl, 1, 1, file );
-			// fwrite( &(*trace)->ul, 1, 1, file );
-			// fwrite( &(*trace)->pl, 1, 1, file );
-			// fwrite( (*trace)->name, 1, (*trace)->nl + (*trace)->ul + (*trace)->pl, file );
-
 			data[0] = (*trace)->email_id;
 			data[1] = (*trace)->tag_id;
 			data[2] = (*trace)->nl;
@@ -277,7 +246,7 @@ void save_file( const char *path )
 			data[4] = (*trace)->pl;
 
 			memcpy( data+5, (*trace)->name, (*trace)->nl + (*trace)->ul + (*trace)->pl );
-
+			chachaCipher( data, 5 + data[2] + data[3] + data[4]);
 			fwrite( data, 1, 5 + (*trace)->nl + (*trace)->ul + (*trace)->pl, file );
 
 			trace = &(*trace)->next;

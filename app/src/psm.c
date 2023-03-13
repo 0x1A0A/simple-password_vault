@@ -89,6 +89,15 @@ void show_email()
 	}
 }
 
+void show_account()
+{
+	account_t *acc = account_list->head;
+	while (acc) {
+		printf("id %s\n", acc->name);
+		acc = acc->next;
+	}
+}
+
 void psm_cmd()
 {
 	byte run = 1;
@@ -169,7 +178,20 @@ void psm_cmd()
 					case EMAIL:M_CREATE(email)break;
 					case ACCOUNT:
 						{
+							char name[20], secret[20], user[20];
+							strncpy( name, tok, strlen(tok) );
+							tok = strtok(NULL, " ");
+							strncpy( user, tok, strlen(tok) );
+							promp("passwd : ");
+							puts("");
+							getpasswd(secret);
 
+							account_t *account = account_create(name,user,secret,
+								strlen(name),strlen(user),strlen(secret));
+
+							if (account) {
+								account_add(account, account_list);
+							}
 						}
 						break;
 					default: ok = 0;
@@ -190,6 +212,7 @@ void psm_cmd()
 					case 0:
 						puts("--tag"); show_tag();
 						puts("--email"); show_email();
+						puts("--account"); show_account();
 						break;
 					case TAG: show_tag();
 							  break;
