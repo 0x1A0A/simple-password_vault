@@ -7,16 +7,18 @@ email_t *email_create(const char *email, uint8_t email_length)
 {
 	if ( !email ) return NULL;
 
-	email_t *nemail = (email_t*)malloc(sizeof(email_t));
 	uint8_t i = 0;
-
-	if (!nemail) {
-		fprintf(stderr, "can't allocate email\n");
-		return NULL;
-	}
+	email_t *nemail = NULL;
 
 	while ( ++i ) {
 		if ( email[i] == '@' ) {
+			nemail = (email_t*)malloc(sizeof(email_t));
+
+			if (!nemail) {
+				fprintf(stderr, "can't allocate email\n");
+				return NULL;
+			}
+
 			nemail->nl = i;
 			nemail->dl = email_length-i-1;
 
@@ -29,7 +31,12 @@ email_t *email_create(const char *email, uint8_t email_length)
 			nemail->next = NULL;
 
 			break;
-		}
+		} 
+	}
+
+	if (!nemail) {
+		fprintf(stderr,"Invalid Email!\n");
+		return NULL;
 	}
 
 	nemail->id = 0;
@@ -167,7 +174,7 @@ int8_t email_exits_name( const char *name, email_list_t *list )
 		email_t **trace = &list->head;
 
 		while (*trace) {
-			if ( strncmp( name, (*trace)->local, (*trace)->dl + (*trace)->nl + 1 ) ) 
+			if ( !strncmp( name, (*trace)->local, (*trace)->dl + (*trace)->nl + 1 ) ) 
 				return 1;
 			trace = &(*trace)->next;
 		}

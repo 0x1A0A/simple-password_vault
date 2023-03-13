@@ -2,6 +2,13 @@
 #include "passwdPromp.h"
 #include <string.h>
 
+#define M_CREATE(type) \
+if(!type##_exits_name(tok, type##_list)) {\
+type##_t *type = type##_create(tok, strlen(tok));\
+if(type) type##_add(type,type##_list);\
+else ok = 0;}\
+else {fprintf(stderr, "'%s' already exits\n", tok);ok=0;}
+
 byte password[256] = "default please change";
 byte nonce[12] = {0,0,0,0,0,0,0,0,0,0,0,0}; // use zero nonce default
 byte hash[32];
@@ -93,9 +100,15 @@ void psm_cmd()
 
 		promp( loggedin ? "loggedin" : "xxx");
 		promp(" _> ");
-		scanf(" %[^\n]", cmd);
+		int isEOF = scanf(" %[^\n]", cmd);
 
-		char *tok = strtok(cmd, " ");	
+		if (isEOF == EOF) {
+			printf("\nExiting ...\n");
+			break;
+		}
+
+		char *tok = strtok(cmd, " ");
+
 		if ( !strcmp(tok, "passwd") ) {
 			promp("passwd : ");
 			getpasswd(password);
@@ -144,49 +157,39 @@ void psm_cmd()
 		switch ( cflag ) {
 			case CREATE:
 				tok = strtok(NULL, " ");
-				if (!tok) break;
+				if (!tok) {
+					printf("insufficient argument\n");
+					break;
+				}
+
+				byte ok = 1;
 
 				switch ( tflag ) {
-					case TAG:
-						tag_t *tag = tag_create(tok, strlen(tok));
-						printf("%u %u\n", tag->id, tag->nl);
-						tag_add(tag, tag_list);
-
-						break;
-					case EMAIL:
-						email_t *em = email_create(tok, strlen(tok));
-						printf("%u %u %u\n", em->id, em->nl, em->dl);
-						email_add(em, email_list);
-
-						break;
+					case TAG:M_CREATE(tag)break;
+					case EMAIL:M_CREATE(email)break;
 					case ACCOUNT:
 						{
 
 						}
 						break;
+					default: ok = 0;
 				}
-				printf("created new '%s'\n", tok);
+				if (ok) printf("created new '%s'\n",tok);
 				break;
 			case DEL:
 				tok = strtok(NULL, " ");
 				if (!tok) break;
 
 				switch ( tflag ) {
-					case TAG:
-						tag_remove_str(tok, tag_list);
-						break;
-					case EMAIL:
-						email_remove_str(tok, email_list);
-						break;
+					case TAG: tag_remove_str(tok, tag_list); break;
+					case EMAIL: email_remove_str(tok, email_list); break;
 				}
 				break;
 			case SHOW:
 				switch ( tflag ) {
 					case 0:
-						puts("tag");
-						show_tag();
-						puts("email");
-						show_email();
+						puts("--tag"); show_tag();
+						puts("--email"); show_email();
 						break;
 					case TAG: show_tag();
 							  break;

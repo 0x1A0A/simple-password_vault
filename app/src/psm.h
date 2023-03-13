@@ -1,3 +1,6 @@
+#ifndef __PSM_H__
+#define __PSM_H__
+
 #include "file.h"
 #include "email.h"
 #include "crypto/sha256.h"
@@ -20,3 +23,5 @@ extern struct chacha20 *cypher;
 void psminit(void);
 void psmclear(void);
 void psm_cmd();
+
+#endif

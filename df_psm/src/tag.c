@@ -157,7 +157,7 @@ int8_t tag_exits_name( const char *name, tag_list_t *list )
 		tag_t **trace = &list->head;
 
 		while (*trace) {
-			if ( strcmp( name, (*trace)->name ) )
+			if ( !strncmp( name, (*trace)->name, (*trace)->nl) )
 				return 1;
 			trace = &(*trace)->next;
 		}
