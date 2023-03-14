@@ -1,5 +1,8 @@
 #include "psm.h"
-#include "passwdPromp.h"
+#include "parse.h"
+
+#include <editline.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define M_CREATE(type) \
@@ -20,11 +23,6 @@ tag_list_t *tag_list;
 email_list_t *email_list;
 struct df_sha256context *sha;
 struct chacha20 *cypher;
-
-void promp(const char *str)
-{
-	printf("%s", str);
-}
 
 void psminit()
 {
@@ -63,14 +61,6 @@ void psmclear()
 #define EMAIL	BIT(1)
 #define ACCOUNT	BIT(2)
 
-void printbyte(const void *str, size_t length)
-{
-	size_t i=0;
-
-	while (i<length) printf("%02x", ((unsigned char *)str)[i++]);
-	puts("");
-}
-
 void show_tag()
 {
 	tag_t *it = tag_list->head;
@@ -98,146 +88,72 @@ void show_account()
 	}
 }
 
-void psm_cmd()
+int create(lexer_t *lexer)
 {
-	byte run = 1;
-	uint8_t cflag = 0;
-	uint8_t tflag = 0;
-
-	while (run) {
-		cflag = tflag = 0;
-
-		promp( loggedin ? "loggedin" : "xxx");
-		promp(" _> ");
-		int isEOF = scanf(" %[^\n]", cmd);
-
-		if (isEOF == EOF) {
-			printf("\nExiting ...\n");
-			break;
-		}
-
-		char *tok = strtok(cmd, " ");
-
-		if ( !strcmp(tok, "passwd") ) {
-			promp("passwd : ");
-			getpasswd(password);
-			
-			sha256_reset(sha);
-
-			sha256context_add(sha, password, strlen(password));
-			sha256context_end(sha, hash);
-
-			sha256_reset(sha);
-
-			memset(password, 0, 256);
-
-			loggedin = 1;
-			promp("\n");
-			continue;
-		}
-
-		if ( !strcmp(tok, "exit") || !strcmp(tok, "quit") || !strcmp(tok, "q") ) {
-			run = 0;
-			break;
-		}
-
-		if ( !loggedin ) {
-			printf("please enter master password first.\n");
-			printf("use \"passwd\" to set master password.\n");
-			continue;
-		}
-
-		//////////////////
-		if ( !strcmp(tok, "create") || !strcmp(tok, "add") ) cflag |= CREATE;
-		if ( !strcmp(tok, "delete") || !strcmp(tok, "del") ) cflag |= DEL;
-		if ( !strcmp(tok, "show") ) cflag |= SHOW;
-		if ( !strcmp(tok, "save") ) cflag |= SAVE;
-		if ( !strcmp(tok, "load") ) cflag |= LOAD;
-		//////////////////
-
-		tok = strtok(NULL, " ");
-
-		if ( tok ) {
-			if ( !strcmp(tok, "tag") ) tflag |= TAG;
-			if ( !strcmp(tok, "email") ) tflag |= EMAIL;
-			if ( !strcmp(tok, "account") ) tflag |= ACCOUNT;
-		}
-
-		switch ( cflag ) {
-			case CREATE:
-				tok = strtok(NULL, " ");
-				if (!tok) {
-					printf("insufficient argument\n");
-					break;
-				}
-
-				byte ok = 1;
-
-				switch ( tflag ) {
-					case TAG:M_CREATE(tag)break;
-					case EMAIL:M_CREATE(email)break;
-					case ACCOUNT:
-						{
-							char name[20], secret[20], user[20];
-							strncpy( name, tok, strlen(tok) );
-							tok = strtok(NULL, " ");
-							strncpy( user, tok, strlen(tok) );
-							promp("passwd : ");
-							puts("");
-							getpasswd(secret);
-
-							account_t *account = account_create(name,user,secret,
-								strlen(name),strlen(user),strlen(secret));
-
-							if (account) {
-								account_add(account, account_list);
-							}
-						}
-						break;
-					default: ok = 0;
-				}
-				if (ok) printf("created new '%s'\n",tok);
-				break;
-			case DEL:
-				tok = strtok(NULL, " ");
-				if (!tok) break;
-
-				switch ( tflag ) {
-					case TAG: tag_remove_str(tok, tag_list); break;
-					case EMAIL: email_remove_str(tok, email_list); break;
-				}
-				break;
-			case SHOW:
-				switch ( tflag ) {
-					case 0:
-						puts("--tag"); show_tag();
-						puts("--email"); show_email();
-						puts("--account"); show_account();
-						break;
-					case TAG: show_tag();
-							  break;
-					case EMAIL: show_email();
-								break;
-				}
-				break;
-			case SAVE:
-				chacha20_block_init(cypher, hash, nonce);
-				if (!tok) {
-					puts("need file name");
-					break;
-				} save_file(tok);
-				break;
-			case LOAD:
-				chacha20_block_init(cypher, hash, nonce);
-				if (!tok) {
-					puts("need file name");
-					break;
-				} load_file(tok);
-				break;
-			default:
-				printf("unknow command\n");
-				break;
-		}
-	}
+	token_t token = parse(lexer);
 }
 
+void delete()
+{
+}
+
+void psm_cmd()
+{
+	int run = 1;
+	char *line;
+	lexer_t lexer;
+
+	while (run && (line=readline( !loggedin ? "?> " : ">>> "))!=NULL) {
+		int ok = 1;
+		token_t tok;
+		lexer.begin = line;
+
+		tok = parse(&lexer);
+		if(!tok.END) {
+			if (!strcmp(tok.begin,"exit") || !strcmp(tok.begin,"quit")) {
+				run = 0;
+				break;
+			}
+
+			if (!strcmp(tok.begin,"passwd")) {
+				el_no_echo = 1;
+				char *passwd = readline("   enter passwd : ");
+
+				if (passwd) {
+					sha256_reset(sha);
+					strncpy(password, passwd, 256);
+
+					sha256context_add(sha, password, strlen(password));
+					sha256context_end(sha, hash);
+
+					sha256_reset(sha);
+
+					memset(password, 0, 256);
+					loggedin = 1;
+				}
+
+				free(passwd);
+				el_no_echo = 0;
+				puts("");
+				load_file("test");
+
+				continue;
+			}
+
+			if (!loggedin) {
+				puts("please enter your password first!");
+				puts("\tyou can use 'passwd' command to enter your password");
+				continue;
+			}
+
+			if (!strcmp(tok.begin, "create") || !(strcmp(tok.begin, "add"))) ok=create(&lexer); // create something
+			if (!strcmp(tok.begin, "delete") || !(strcmp(tok.begin, "del"))); // delete something
+			if (!strcmp(tok.begin, "show")); // show something
+			if (!strcmp(tok.begin, "save")); // save to file something
+			if (!strcmp(tok.begin, "load") || !strcmp(tok.begin, "open")); // open file something
+			
+		}
+
+		free(line);
+	}
+}
