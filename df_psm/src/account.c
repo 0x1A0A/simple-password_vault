@@ -58,7 +58,7 @@ void account_destroy ( account_t *account)
 	}
 }
 
-void account_list_destroy(account_list_t *list)
+void account_list_reset(account_list_t *list)
 {
 	if (list) {
 		account_t *temp;
@@ -67,8 +67,16 @@ void account_list_destroy(account_list_t *list)
 			list->head = temp->next;
 			account_destroy(temp);
 		}
-		free(list);
 	}
+
+	list->head = NULL;
+	list->count = 0;
+}
+
+void account_list_destroy(account_list_t *list)
+{
+	account_list_reset(list);
+	free(list);
 }
 
 void account_add( account_t *account, account_list_t *list )
@@ -134,4 +142,16 @@ void account_tag( account_t *account, uint8_t tag_id, tag_list_t *list)
 	if ( account && tag_exits(tag_id, list)) {
 		account->tag_id = tag_id;
 	}
+}
+
+account_t * account_find_name(const char *name, account_list_t *list)
+{
+	account_t **trace = &(list->head);
+
+	while (*trace) {
+		if (!strncmp(name, (*trace)->name, (*trace)->nl)) return *trace;
+		trace = &(*trace)->next; 
+	}
+
+	return NULL;
 }

@@ -8,7 +8,7 @@ typedef struct Lexer lexer_t;
 
 struct Token {
 	const char *begin;
-	size_t lenght;
+	size_t length;
 	int END;
 };
 

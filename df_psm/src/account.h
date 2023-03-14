@@ -25,6 +25,7 @@ account_t * account_create(	const char *name, const char *user, const char *pass
 account_list_t *account_list_create();
 void account_destroy ( account_t *account);
 void account_list_destroy(account_list_t *list);
+void account_list_reset(account_list_t *list);
 
 void account_add( account_t *account, account_list_t *list );
 void account_remove( account_t *account, account_list_t *list );
@@ -32,5 +33,7 @@ void account_remove_str( const char *name, account_list_t *list );
 
 void account_link_email( account_t *account, uint8_t email_id, email_list_t *list);
 void account_tag( account_t *account, uint8_t tag_id, tag_list_t *list);
+
+account_t * account_find_name(const char *name, account_list_t *list);
 
 #endif

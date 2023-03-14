@@ -68,7 +68,7 @@ void email_destroy( email_t *email )
 	}
 }
 
-void email_list_destroy(email_list_t *list)
+void email_list_reset(email_list_t *list)
 {
 	if (list) {
 		email_t *temp;
@@ -79,7 +79,13 @@ void email_list_destroy(email_list_t *list)
 			email_destroy(temp);
 		}
 	}
+	list->head = NULL;
+	list->count = 0;
+}
 
+void email_list_destroy(email_list_t *list)
+{
+	email_list_reset(list);
 	free(list);
 }
 

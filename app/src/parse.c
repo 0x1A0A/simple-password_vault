@@ -27,13 +27,18 @@ static int find_until_space(lexer_t *lexer) {
 
 token_t parse(lexer_t *lexer)
 {
-	token_t token={.begin=0,.lenght=0,.END=0};
+	token_t token={.begin=0,.length=0,.END=0};
+
+	if ( *(lexer->begin) == '\0' ) {
+		token.END = 1;
+		return token;
+	}
 
 	while (isspace( *(lexer->begin) )) lexer->begin++;
 
-	if (isalnum(*(lexer->begin))) {
+	if (isalnum(*(lexer->begin)) || ispunct(*(lexer->begin))) {
 		token.begin = lexer->begin;
-		token.lenght = find_until_space(lexer);
+		token.length = find_until_space(lexer);
 
 		return token;
 	}
@@ -42,7 +47,7 @@ token_t parse(lexer_t *lexer)
 		case '"':
 			lexer->begin++;
 			token.begin = lexer->begin;
-			token.lenght = find_until( *(lexer->begin-1), lexer );
+			token.length = find_until( *(lexer->begin-1), lexer );
 		break;
 		default:
 			token.END = 1;
@@ -54,5 +59,5 @@ token_t parse(lexer_t *lexer)
 
 void token_print(token_t token)
 {
-	printf("%.*s\n", token.lenght, token.begin);	
+	printf("%.*s\n", token.length, token.begin);	
 }

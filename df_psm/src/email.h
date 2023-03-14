@@ -23,6 +23,7 @@ email_t * email_create(const char *email, uint8_t email_length);
 email_list_t *email_list_create();
 void email_destroy ( email_t *email);
 void email_list_destroy(email_list_t *list);
+void email_list_reset(email_list_t *list);
 
 void email_add( email_t *email, email_list_t *list );
 void email_remove( email_t *email, email_list_t *list );

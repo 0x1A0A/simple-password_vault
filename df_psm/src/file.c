@@ -38,6 +38,7 @@ static void chachaCipher(byte *datain, size_t length)
 static tag_t* take_tag(FILE *file)
 {
 	tag_t *neww = (tag_t*)malloc( sizeof(tag_t) );
+	neww->next = NULL;
 
 	fread( &neww->id, 1, 1, file );
 	fread( &neww->nl, 1, 1, file );
@@ -56,6 +57,8 @@ static tag_t* take_tag(FILE *file)
 static email_t* take_email(FILE *file)
 {
 	email_t *neww = (email_t*)malloc(sizeof(email_t));
+	neww->next = NULL;
+
 	fread(&neww->id, 1, 1, file);
 	fread(&neww->nl, 1, 1, file); 
 	fread(&neww->dl, 1, 1, file); 
@@ -76,6 +79,7 @@ static email_t* take_email(FILE *file)
 static account_t* take_account(FILE *file)
 {
 	account_t *neww = (account_t*)malloc(sizeof(account_t));
+	neww->next = NULL;
 
 	fread(&neww->email_id, 1, 1, file);
 	fread(&neww->tag_id, 1, 1, file);
@@ -154,6 +158,7 @@ void load_file( const char *path )
 
 	if ( strncmp( hash, data, 32 ) ) {
 		fprintf( stderr, "password incorrect\n" );
+		fclose(file);
 		return ;
 	}
 

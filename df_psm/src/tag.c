@@ -55,8 +55,7 @@ void tag_destroy(tag_t *tag)
 	}
 }
 
-// deallocate tag list and all tag in the list
-void tag_list_destroy(tag_list_t *list)
+void tag_list_reset(tag_list_t *list)
 {
 	if (list) {
 		tag_t *temp;
@@ -66,9 +65,17 @@ void tag_list_destroy(tag_list_t *list)
 			list->head = temp->next;
 			tag_destroy(temp);
 		}
-
-		free(list);
 	}
+	
+	list->head = NULL;
+	list->count = 0;
+}
+
+// deallocate tag list and all tag in the list
+void tag_list_destroy(tag_list_t *list)
+{
+	tag_list_reset(list);
+	free(list);
 }
 
 // add tag to list
@@ -121,7 +128,7 @@ void tag_remove_str( const char *name, tag_list_t *list )
 		tag_t **trace = &(list->head), *temp;
 
 		while (*trace) {
-			if ( strncmp( name, (*trace)->name, (*trace)->nl ) ) { // target
+			if ( !strncmp( name, (*trace)->name, (*trace)->nl ) ) { // target
 				temp = *trace;
 				(*trace) = temp->next;
 				tag_destroy(temp);

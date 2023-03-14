@@ -21,6 +21,7 @@ tag_t * tag_create(const char *name, uint8_t length);
 tag_list_t *tag_list_create();
 void tag_destroy ( tag_t *tag);
 void tag_list_destroy(tag_list_t *list);
+void tag_list_reset(tag_list_t *list);
 
 void tag_add( tag_t *tag, tag_list_t *list );
 void tag_remove( tag_t *tag, tag_list_t *list );
