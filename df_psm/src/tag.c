@@ -188,3 +188,17 @@ uint8_t tag_get_id( const char *name, tag_list_t *list )
 
 	return 0;
 }
+
+tag_t * tag_find_name(const char *name, tag_list_t *list)
+{
+	if ( list ) {
+		tag_t **trace = &list->head;
+
+		while (*trace) {
+			if ( !strncmp( name, (*trace)->name, (*trace)->nl) ) return *trace;
+			trace = &(*trace)->next;
+		}
+	}
+
+	return NULL;
+}

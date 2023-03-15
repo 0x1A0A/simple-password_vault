@@ -1,12 +1,15 @@
-#include "parse.h"
-#include "string.h"
 #include <stdio.h>
 #include <ctype.h>
+
+#include "parse.h"
+#include "string.h"
 
 // return destance to the next character
 static int find_until(const char target, lexer_t *lexer)
 {
 	size_t l = 0;
+
+	printf("%c\n", target);
 
 	while (*(lexer->begin)){
 		if (*(lexer->begin++) != target) ++l;
@@ -36,7 +39,7 @@ token_t parse(lexer_t *lexer)
 
 	while (isspace( *(lexer->begin) )) lexer->begin++;
 
-	if (isalnum(*(lexer->begin)) || ispunct(*(lexer->begin))) {
+	if (isalnum(*(lexer->begin)) || *(lexer->begin)=='-') {
 		token.begin = lexer->begin;
 		token.length = find_until_space(lexer);
 

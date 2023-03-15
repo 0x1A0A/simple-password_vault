@@ -1,5 +1,4 @@
 #include "file.h"
-#include "crypto/sha256.h"
 #include "crypto/chacha20.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,10 +7,8 @@
 extern account_list_t *account_list;
 extern tag_list_t *tag_list;
 extern email_list_t *email_list;
-extern struct df_sha256context *sha;
+
 extern struct chacha20 *cypher;
-extern byte password[256];
-extern byte nonce[12];
 extern byte hash[32];
 
 static void chachaCipher(byte *datain, size_t length)

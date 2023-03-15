@@ -32,4 +32,6 @@ int8_t tag_exits( const int8_t id, tag_list_t *list );
 int8_t tag_exits_name( const char *name, tag_list_t *list );
 uint8_t tag_get_id( const char *name, tag_list_t *list );
 
+tag_t * tag_find_name(const char *name, tag_list_t *list);
+
 #endif

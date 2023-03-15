@@ -35,4 +35,6 @@ int8_t email_exits( const uint8_t id, email_list_t *list );
 int8_t email_exits_name( const char *name, email_list_t *list );
 uint8_t email_get_id( const char *name, email_list_t *list );
 
+email_t * email_find_name(const char *name, email_list_t *list);
+
 #endif

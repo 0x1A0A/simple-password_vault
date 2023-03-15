@@ -203,3 +203,17 @@ uint8_t email_get_id( const char *name, email_list_t *list )
 
 	return 0;
 }
+
+email_t * email_find_name(const char *name, email_list_t *list)
+{
+	if ( list ) {
+		email_t **trace = &list->head;
+
+		while (*trace) {
+			if ( !strncmp( name, (*trace)->local, (*trace)->dl + (*trace)->nl + 1 ) ) return *trace;
+			trace = &(*trace)->next;
+		}
+	}
+
+	return NULL;
+}
