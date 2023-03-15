@@ -103,6 +103,8 @@ uint8_t sha256context_add(struct df_sha256context *ctx, byte *in, size_t length 
 			ctx->current_index = 0;
 		}
 	}
+
+	return 1;
 }
 
 uint8_t sha256context_end(struct df_sha256context *ctx, byte out[32])

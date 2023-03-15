@@ -13,7 +13,7 @@ extern byte hash[32];
 
 static void chachaCipher(byte *datain, size_t length)
 {
-	int *index = &cypher->index;
+	int *index = (int*)&cypher->index;
 	int i=0;
 
 	while ( i < length ) {
@@ -46,7 +46,7 @@ static tag_t* take_tag(FILE *file)
 	neww->name = (char*)malloc(neww->nl);
 	fread( neww->name, 1, neww->nl, file);
 
-	chachaCipher( neww->name, neww->nl );
+	chachaCipher( (byte*)neww->name, neww->nl );
 
 	return neww;
 }
@@ -68,7 +68,7 @@ static email_t* take_email(FILE *file)
 	neww->domain = neww->local + neww->nl + 1;
 	fread(neww->local, 1, neww->nl + neww->dl + 1, file);
 
-	chachaCipher(neww->local, neww->nl + neww->dl + 1);
+	chachaCipher((byte*)neww->local, neww->nl + neww->dl + 1);
 
 	return neww;
 }
@@ -95,7 +95,7 @@ static account_t* take_account(FILE *file)
 	neww->password = neww->user + neww->ul;
 	fread(neww->name, 1, neww->nl + neww->ul + neww->pl, file);
 
-	chachaCipher(neww->name, neww->nl + neww->ul + neww->pl);
+	chachaCipher((byte*)neww->name, neww->nl + neww->ul + neww->pl);
 
 	return neww;
 }
@@ -120,7 +120,7 @@ unsigned char verify(const char *path)
 	fread(data, 1, 32, file);
 	chachaCipher(data, 32);
 
-	if ( strncmp( hash, data, 32 ) ) {
+	if ( strncmp( (char*)hash, (char*)data, 32 ) ) {
 		fprintf( stderr, "password incorrect\n" );
 		return 0;
 	}
@@ -153,10 +153,10 @@ void load_file( const char *path )
 	// for (int j=0; j<32; ++j) printf("%02x", hash[j]);
 	// puts("");
 
-	if ( strncmp( hash, data, 32 ) ) {
+	if ( strncmp( (char*)hash, (char*)data, 32 ) ) {
 		fprintf( stderr, "password incorrect\n" );
 		fclose(file);
-		return ;
+		return;
 	}
 
 	// tag

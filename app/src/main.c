@@ -43,7 +43,7 @@ int passwd(void *arg)
 
 	if (password) {
 		sha256_reset(sha);
-		sha256context_add(sha, password, strlen(password));
+		sha256context_add(sha, (byte*)password, strlen(password));
 		sha256context_end(sha, hash);
 		free(password);
 		return LOGGEDIN;

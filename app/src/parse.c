@@ -62,5 +62,5 @@ token_t parse(lexer_t *lexer)
 
 void token_print(token_t token)
 {
-	printf("%.*s\n", token.length, token.begin);	
+	printf("%.*s\n", (int)token.length, token.begin);	
 }

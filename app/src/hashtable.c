@@ -14,7 +14,7 @@ hashtable_t *hashtable_create(const int size)
 	return neww;
 }
 
-void *hashtable_destroy(hashtable_t *table)
+void hashtable_destroy(hashtable_t *table)
 {
 	free(table->table);
 	table->table = NULL;

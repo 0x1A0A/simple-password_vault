@@ -25,10 +25,10 @@ void chacha20_destroy(struct chacha20 *ctx)
 
 void chacha20_block_init(struct chacha20 *ctx, byte key[32], byte nonce[12])
 {
-	strncpy( (byte*)(ctx->block.cc_const), "expand 32-byte k", 16 );
-	strncpy( (byte*)(ctx->block.key), key, 32 );
+	strncpy( (char*)(ctx->block.cc_const), "expand 32-byte k", 16 );
+	strncpy( (char*)(ctx->block.key), (char*)key, 32 );
 	ctx->block.counter = 0;
-	strncpy( (byte*)(ctx->block.nonce), nonce,12 );
+	strncpy( (char*)(ctx->block.nonce), (char*)nonce,12 );
 }
 
 void chacha20_key_stream_gen(struct chacha20 *ctx)
