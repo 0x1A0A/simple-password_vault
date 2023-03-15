@@ -15,10 +15,9 @@ struct df_hashtable {
 	int (*function)(void*);
 };
 
-command_t command_create(const char *name, int (*)(void*));
 hashtable_t *hashtable_create(const int size);
 void *hashtable_destroy(hashtable_t *table);
 command_t *hashtable_search(const char *name, hashtable_t *table);
-int hashtable_insert(command_t command, hashtable_t *table);
+int hashtable_insert(const char *name, int (*fn)(void*), hashtable_t *table);
 
 #endif

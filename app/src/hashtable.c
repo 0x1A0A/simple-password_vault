@@ -3,15 +3,6 @@
 #include <stdio.h>
 #include <string.h>
 
-command_t command_create(const char *name, int (*fn)(void*))
-{
-	command_t neww;
-	strncpy( neww.name, name, strlen(name) );
-	neww.callback = fn;
-
-	return neww;
-}
-
 hashtable_t *hashtable_create(const int size)
 {
 	hashtable_t *neww = (hashtable_t*)malloc(sizeof(hashtable_t));
@@ -44,13 +35,14 @@ command_t *hashtable_search(const char *name, hashtable_t *table)
 	return NULL;
 }
 
-int hashtable_insert(command_t command, hashtable_t *table)
+int hashtable_insert(const char *name, int (*fn)(void*), hashtable_t *table)
 {
-	command_t *c = hashtable_search( command.name, table );
+	command_t *c = hashtable_search( name, table );
 	if (c) { return -1; } // used space
 
-	int n = table->function( (void*)(command.name) )%table->SIZE;
-	table->table[n] = command;
+	int n = table->function( (void*)(name) )%table->SIZE;
+	strncpy(table->table[n].name, name, strlen(name));
+	table->table[n].callback = fn;
 
 	return n;
 }
