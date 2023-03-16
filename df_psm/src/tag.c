@@ -121,6 +121,25 @@ void tag_remove( tag_t *tag, tag_list_t *list )
 	}
 }
 
+void tag_remove_id( const int id, tag_list_t *list )
+{
+	if (list) {
+		tag_t **trace = &(list->head), *temp;
+
+		while (*trace) {
+			if ( (*trace)->id == id ) { // target
+				temp = *trace;
+				(*trace) = temp->next;
+				tag_destroy(temp);
+				list->count--;
+				break; 
+			}
+
+			trace = &((*trace)->next);
+		}
+	}
+}
+
 // remove tag name from list
 void tag_remove_str( const char *name, tag_list_t *list )
 {

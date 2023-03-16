@@ -25,6 +25,7 @@ void tag_list_reset(tag_list_t *list);
 
 void tag_add( tag_t *tag, tag_list_t *list );
 void tag_remove( tag_t *tag, tag_list_t *list );
+void tag_remove_id( const int id, tag_list_t *list );
 void tag_remove_str( const char *name, tag_list_t *list );
 
 //---checking

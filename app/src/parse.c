@@ -8,9 +8,6 @@
 static int find_until(const char target, lexer_t *lexer)
 {
 	size_t l = 0;
-
-	printf("%c\n", target);
-
 	while (*(lexer->begin)){
 		if (*(lexer->begin++) != target) ++l;
 		else break;

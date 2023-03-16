@@ -27,6 +27,7 @@ void email_list_reset(email_list_t *list);
 
 void email_add( email_t *email, email_list_t *list );
 void email_remove( email_t *email, email_list_t *list );
+void email_remove_id( const int id, email_list_t *list );
 void email_remove_str( const char *email_str, email_list_t *list );
 int email_string_is_equal( const char *email_str, email_t *email );
 

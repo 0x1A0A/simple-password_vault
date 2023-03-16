@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <editline.h>
-#include "psm.h"
+#include "common.h"
 #include "parse.h"
 #include "hashtable.h"
 #include "src/crypto/chacha20.h"
 #include "src/crypto/sha256.h"
+#include "command/command.h"
 
 account_list_t *account_list;
 tag_list_t *tag_list;
@@ -17,57 +18,39 @@ struct df_sha256context *sha;
 
 int authorized = 0;
 
-enum __RESPONSE {
-	OK,
-	LOGGEDIN,
-	LEAVE,
-	COUNT,
-};
-
-int hfn(void *arg)
+size_t hfn(void *arg)
 {
 	char *str = (char*)arg;
 	int l = strlen(str);
-	return (str[0] - 'a') << 3 | (str[1] - 'a') << 2 | (str[l-2] - 'a') << 1 | (str[l-1] - 'a') << 0;
+	return 	(str[0] - 'a') << 8*3	|
+			(str[1] - 'a') << 8*2	|
+			(str[l-2] - 'a') << 8*1	|
+			(str[l-1] - 'a') << 8*0;
 }
 
-int leave(void *arg) { return LEAVE; }
-
-int passwd(void *arg)
-{	
-	lexer_t *lexer = (lexer_t*)arg;
-	
-	el_no_echo = 0;
-	char *password = readline("  Enter password: "); puts("");
-	el_no_echo = 1;
-
-	if (password) {
-		sha256_reset(sha);
-		sha256context_add(sha, (byte*)password, strlen(password));
-		sha256context_end(sha, hash);
-		free(password);
-		return LOGGEDIN;
-	}
-
-	free(password);
-	return OK;
-}
-
-#define CMD(a,b) hashtable_insert( a, b, table );
+#define CMD(a,b) hashtable_insert(a,b,table);
 
 int main(int argc, char **argv)
 {
 	sha = sha256context_create();
+	cypher = chacha20_create();
 
-	hashtable_t *table = hashtable_create(20);
+	// I choose 19 and the result for this command
+	// I get the perfect hash
+	hashtable_t *table = hashtable_create(19);
 	table->function = hfn;
 
 	tag_list = tag_list_create();
 	email_list = email_list_create();
 	account_list = account_list_create();
 
-	CMD("exit", leave);
-	CMD("passwd", passwd);
+	CMD("exit",		leave);
+	CMD("passwd",	passwd);
+	CMD("add",		add_entry);
+	CMD("del",		del_entry);
+	CMD("show",		show_entry);
+	CMD("load",		load_entry);
+	CMD("save",		save_entry);
 
 	char *line;
 	char buff[16];
@@ -82,7 +65,7 @@ int main(int argc, char **argv)
 			
 			command_t *c = hashtable_search( buff, table );
 			if (c) {
-				int res = c->callback(NULL);
+				int res = c->callback((void*)&lexer);
 				if (res == LEAVE) break; //end
 				if (res == LOGGEDIN) authorized = 1; //end
 			} else {
@@ -99,6 +82,7 @@ int main(int argc, char **argv)
 
 	hashtable_destroy(table);
 
+	chacha20_destroy(cypher);
 	sha256context_destroy(sha);
 
 	return 0;

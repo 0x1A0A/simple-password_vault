@@ -22,22 +22,23 @@ void hashtable_destroy(hashtable_t *table)
 	table = NULL;
 }
 
+command_t *hashtable_is_empty(const char *name, hashtable_t *table)
+{
+	size_t n = table->function( (void*)name )%table->SIZE;
+	if ( !table->table[n].callback ) return NULL;
+	return table->table+n;
+}
+
 command_t *hashtable_search(const char *name, hashtable_t *table)
 {
-	int n = table->function( (void*)name )%table->SIZE;
-
-	if ( !table->table[n].callback ) return NULL;
-
-	if (!strcmp(name, table->table[n].name)) {
-		return table->table+n;
-	}
-
+	command_t *c = hashtable_is_empty(name, table);
+	if (c && !strcmp( name, c->name )) return c;
 	return NULL;
 }
 
 int hashtable_insert(const char *name, int (*fn)(void*), hashtable_t *table)
 {
-	command_t *c = hashtable_search( name, table );
+	command_t *c = hashtable_is_empty( name, table );
 	if (c) { return -1; } // used space
 
 	int n = table->function( (void*)(name) )%table->SIZE;
