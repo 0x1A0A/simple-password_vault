@@ -10,5 +10,6 @@ int passwd(void *arg);
 
 int load_entry(void *arg);
 int save_entry(void *arg);
+void show_secret(const char *name);
 
 #endif

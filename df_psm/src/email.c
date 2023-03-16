@@ -150,7 +150,7 @@ void email_remove_id( const int id, email_list_t *list )
 			if ( (*trace)->id == id ) { // target
 				temp = *trace;
 				(*trace) = temp->next;
-				tag_destroy(temp);
+				email_destroy(temp);
 				list->count--;
 				break; 
 			}

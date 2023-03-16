@@ -114,7 +114,7 @@ unsigned char verify(const char *path)
 	while (i++ < 8) fgetc(file);
 	
 	byte data[32];	
-	uint8_t BUFF;
+	//uint8_t BUFF;
 	
 	// hash password
 	fread(data, 1, 32, file);

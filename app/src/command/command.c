@@ -15,8 +15,6 @@ int leave(void *arg) { return LEAVE; }
 
 int passwd(void *arg)
 {	
-	lexer_t *lexer = (lexer_t*)arg;
-	
 	el_no_echo = 1;
 	char *password = readline("  Enter password: "); puts("");
 	el_no_echo = 0;
@@ -76,4 +74,18 @@ void notallow()
 {
 	puts("please enter key to unlock");
 	puts("  use 'passwd' to enter key");
+}
+
+void show_secret(const char *name)
+{
+	account_t *account = account_find_name(name, account_list);
+	if (account) {
+		printf("  id %.*s\n  user - %.*s\n  password - %.*s\n",
+			account->nl, account->name,
+			account->ul, account->user,
+			account->pl, account->password
+		);
+	} else {
+		puts("no account found");
+	}
 }
