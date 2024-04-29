@@ -18,3 +18,11 @@ add_library(
 	df_crypto STATIC
 	${SRC_CRYPTO_FILE}
 )
+
+file(GLOB UNIT_TEST_FILE
+	${CMAKE_CURRENT_LIST_DIR}/tests/*.c
+)
+
+add_executable(unit_test ${UNIT_TEST_FILE})
+target_link_libraries(unit_test cmocka df_crypto df_password_man)
+add_test(NAME unit_test_lib COMMAND unit_test)
