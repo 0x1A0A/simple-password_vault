@@ -1,0 +1,25 @@
+name: unit-test
+
+on:
+  workflow_dispatch:
+  push:
+    branches: main
+    paths:
+      - "app/**"
+      - "df_psm/**"
+
+jobs:
+  cLang:
+    name: c
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: build
+        run: cmake -S ./ -B build
+
+      - run: cmake --build build
+
+      - name: run test
+        run: cd build && ctest
