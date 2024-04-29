@@ -16,6 +16,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: install dependency
+        run: apt install libedit-dev
+
       - name: build
         run: cmake -S ./ -B build
 
