@@ -77,6 +77,21 @@ static void tag_find_by_name_tests(void **state) {
   assert_true(NULL == tag_find_name("none_exists_tag", list));
 }
 
+static void tag_remove_tests(void **state) {
+  tag_list_t *list = *state;
+
+  tag_t *tag = tag_find_name("new_tag", list);
+
+  tag_remove(tag, list);
+  assert_null(tag_find_name("new_tag", list));
+
+  tag_remove_id(1, list);
+  assert_false(tag_exits(1, list));
+
+  tag_remove_str("yo", list);
+  assert_null(tag_find_name("yo", list));
+}
+
 static void tag_list_reset_tests(void **state) {
   tag_list_t *list = *state;
 
@@ -96,6 +111,7 @@ int main(void) {
       cmocka_unit_test_prestate(tag_exits_tests, list),
       cmocka_unit_test_prestate(tag_get_id_tests, list),
       cmocka_unit_test_prestate(tag_find_by_name_tests, list),
+      cmocka_unit_test_prestate(tag_remove_tests, list),
       cmocka_unit_test_prestate(tag_list_reset_tests, list),
   };
 
