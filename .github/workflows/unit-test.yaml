@@ -16,8 +16,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: install dependency
-        run: sudo apt install libeditline-dev
+      - name: install editline
+        run: |
+          wget https://github.com/troglobit/editline/releases/download/1.17.1/editline-1.17.1.tar.gz
+          tar xf editline-1.15.3.tar.xz
+          cd editline-1.15.3/
+          ./configure --prefix=/usr
+          make all
+          sudo make install
 
       - name: build
         run: cmake -S ./ -B build
